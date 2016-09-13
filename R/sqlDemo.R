@@ -77,7 +77,7 @@ dbGetQuery(db$con, "select * from clm_modGlm")
 # the same, but with a complicated model fitted using open source R
 # ensemble of 20 single-layer neural networks with 5 hidden nodes each
 library(nnet)
-load("clm_modNN.rdata")
+load("data/clm_modNN.rdata")
 print(clm_modNN)
 
 saveModelObjects(clm_modNN, woe, destTable="clm_modNN", connectionString=connStr)

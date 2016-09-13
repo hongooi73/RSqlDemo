@@ -1,4 +1,4 @@
-use claimsDemoLocal
+use sqlDemoLocal
 go
 
 drop table if exists claimsSamp_predGlm;

@@ -1,4 +1,4 @@
-use claimsDemoLocal
+use sqlDemoLocal
 go
 
 drop procedure if exists dbo.clm_scoreGlm
