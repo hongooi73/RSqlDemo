@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ArrayOfArrayOfArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ArrayOfArrayOfString>
+    <ArrayOfString>
+      <string>c:\users\hongooi\documents\rsqldemo\r\sqlDemosetup.r</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>Team Explorer - Home</string>
+    </ArrayOfString>
+  </ArrayOfArrayOfString>
+</ArrayOfArrayOfArrayOfString>

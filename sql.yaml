@@ -1,0 +1,6 @@
+sqlDemoLocal:
+    server: localhost
+    type: sqlserver
+    user: sa
+    password: Password1!
+    port: 1433
