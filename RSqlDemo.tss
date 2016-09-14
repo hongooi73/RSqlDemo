@@ -2,10 +2,28 @@
 <ArrayOfArrayOfArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <ArrayOfArrayOfString>
     <ArrayOfString>
-      <string>c:\users\hongooi\documents\rsqldemo\r\sqlDemosetup.r</string>
+      <string>c:\users\hongooi\documents\rsqldemo\r\savemodelobjects.r</string>
     </ArrayOfString>
     <ArrayOfString>
-      <string>Team Explorer - Home</string>
+      <string>C:\Users\hongooi\documents\RSqlDemo\R\sqlDemo.R</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>c:\users\hongooi\documents\rsqldemo\r\sqldemofitmodel.r</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>c:\users\hongooi\documents\rsqldemo\r\sqldemosetup.r</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>c:\users\hongooi\documents\rsqldemo\r\sqldemotransformdata.r</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>c:\users\hongooi\documents\rsqldemo\sql.yaml</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>Team Explorer - Changes</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>C:\Users\hongooi\documents\RSqlDemo\README.md</string>
     </ArrayOfString>
   </ArrayOfArrayOfString>
 </ArrayOfArrayOfArrayOfString>
