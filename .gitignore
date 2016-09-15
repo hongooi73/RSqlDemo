@@ -7,6 +7,9 @@
 # R History
 .Rhistory
 
+# Tabs Studio
+*.tss
+
 # User-specific files
 *.suo
 *.user
