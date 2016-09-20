@@ -31,13 +31,13 @@ updateSQLScript("sql/scoreExecNN.sql", RServicesYamlLocation)
 # source data from Azure blob storage
 # sample of NYC taxi ride data
 if(!dir.exists("data")) dir.create(data)
-if(!file.exists("data/nyctaxis.csv"))
-    download.file("http://getgoing.blob.core.windows.net/public/nyctaxi1pct.csv", "data/nyctaxis.csv")
+if(!file.exists("data/nyctaxis_sample.csv"))
+    download.file("http://getgoing.blob.core.windows.net/public/nyctaxi1pct.csv", "data/nyctaxi_sample.csv")
 
 
 # convert to xdf
 library(dplyrXdf)
-taxiCsv <- RxTextData("data/nyctaxis.csv")
+taxiCsv <- RxTextData("data/nyctaxi_sample.csv")
 taxiXdf <- taxiCsv %>%
     mutate(pickup_datetime=as.POSIXct(pickup_datetime),
            dropoff_datetime=as.POSIXct(dropoff_datetime))
@@ -45,16 +45,16 @@ taxiXdf <- taxiCsv %>%
 
 # upload full dataset to database
 connStr <- local({
-	db <- yaml::yaml.load_file("sql.yaml")
-	sprintf("Driver=SQL Server;Server=%s;database=%s;Uid=%s;Pwd=%s",
-			db[[1]]$server, names(db)[1], db[[1]]$user, db[[1]]$password)
+    db <- yaml::yaml.load_file("sql.yaml")
+    sprintf("Driver=SQL Server;Server=%s;database=%s;Uid=%s;Pwd=%s",
+            db[[1]]$server, names(db)[1], db[[1]]$user, db[[1]]$password)
 })
-taxiSql <- RxSqlServerData("nyctaxis", connectionString=connStr)
-if(!rxSqlServerTableExists("nyctaxis", connStr)) rxDataStep(taxiXdf, taxiSql)
+taxiSql <- RxSqlServerData("nyctaxi_sample", connectionString=connStr)
+if(!rxSqlServerTableExists("nyctaxi_sample", connStr)) rxDataStep(taxiXdf, taxiSql)
 
 # upload first 100 rows as sample
-taxiSamp <- RxSqlServerData("nyctaxisSamp", connectionString=connStr)
-if(!rxSqlServerTableExists("nyctaxisSamp", connStr)) rxDataStep(taxiXdf, taxiSamp, numRows=100)
+taxiSamp <- RxSqlServerData("nyctaxi_sample100", connectionString=connStr)
+if(!rxSqlServerTableExists("nyctaxi_sample100", connStr)) rxDataStep(taxiXdf, taxiSamp, numRows=100)
 
 
 # create some derived variables for modelling
