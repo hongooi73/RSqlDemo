@@ -28,16 +28,19 @@ updateSQLScript("sql/scoreExec.sql", RServicesYamlLocation)
 updateSQLScript("sql/scoreExecNN.sql", RServicesYamlLocation)
 
 
-# source data from packages.revo
-# synthetic dataset (?) of insurance claims
+# source data from Azure blob storage
+# sample of NYC taxi ride data
 if(!dir.exists("data")) dir.create(data)
-download.file("http://packages.revolutionanalytics.com/datasets/claims.xdf", "data/claims.xdf", mode="wb")
+if(!file.exists("data/nyctaxis.csv"))
+    download.file("http://getgoing.blob.core.windows.net/public/nyctaxi1pct.csv", "data/nyctaxis.csv")
 
 
-# add a has_claim indicator
+# convert to xdf
 library(dplyrXdf)
-clm <- RxXdfData("data/claims.xdf")
-rxDataStep(clm, clm, transforms=list(has_claim=Claim_Amount > 0), overwrite=TRUE)
+taxiCsv <- RxTextData("data/nyctaxis.csv")
+taxiXdf <- taxiCsv %>%
+    mutate(pickup_datetime=as.POSIXct(pickup_datetime),
+           dropoff_datetime=as.POSIXct(dropoff_datetime))
 
 
 # upload full dataset to database
@@ -46,12 +49,12 @@ connStr <- local({
 	sprintf("Driver=SQL Server;Server=%s;database=%s;Uid=%s;Pwd=%s",
 			db[[1]]$server, names(db)[1], db[[1]]$user, db[[1]]$password)
 })
-clmSql <- RxSqlServerData("claims", connectionString=connStr)
-if(!rxSqlServerTableExists("claims", connStr)) rxDataStep(clm, clmSql)
+taxiSql <- RxSqlServerData("nyctaxis", connectionString=connStr)
+if(!rxSqlServerTableExists("nyctaxis", connStr)) rxDataStep(taxiXdf, taxiSql)
 
 # upload first 100 rows as sample
-clmSqlSamp <- RxSqlServerData("claimsSamp", connectionString=connStr)
-if(!rxSqlServerTableExists("claimsSamp", connStr)) rxDataStep(clm, clmSqlSamp, numRows=100)
+taxiSamp <- RxSqlServerData("nyctaxisSamp", connectionString=connStr)
+if(!rxSqlServerTableExists("nyctaxisSamp", connStr)) rxDataStep(taxiXdf, taxiSamp, numRows=100)
 
 
 # create some derived variables for modelling
