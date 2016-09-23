@@ -27,12 +27,13 @@ if(!file.exists("data/nyctaxi_sample.csv"))
     download.file("http://getgoing.blob.core.windows.net/public/nyctaxi1pct.csv", "data/nyctaxi_sample.csv")
 
 
-# convert datetimes from char to POSIXct
+# import to xdf, convert datetimes from char to POSIXct
 library(dplyrXdf)
 taxiCsv <- RxTextData("data/nyctaxi_sample.csv")
 taxiXdf <- taxiCsv %>%
     mutate(pickup_datetime=as.POSIXct(pickup_datetime),
-           dropoff_datetime=as.POSIXct(dropoff_datetime))
+           dropoff_datetime=as.POSIXct(dropoff_datetime)) %>%
+    persist("data/nyctaxi_sample.xdf")
 
 
 # upload full dataset to database

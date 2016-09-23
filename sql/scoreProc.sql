@@ -20,7 +20,7 @@ as begin
 
     insert into nyctaxi_predGlm
     exec sp_execute_external_script @language=N'R', @script=N'
-        # unserialise the model
+        # unserialise model objects
         rawCont <- memDecompress(as.raw(model), "gzip")
         rc <- rawConnection(rawCont, "rb")
         load(rc)

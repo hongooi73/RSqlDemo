@@ -27,7 +27,7 @@ as begin
             data.frame(tipped_pred=rowMeans(preds))
         }
 
-        # unserialise the model
+        # unserialise model objects
         rawCont <- memDecompress(as.raw(model), "gzip")
         rc <- rawConnection(rawCont, "rb")
         load(rc)

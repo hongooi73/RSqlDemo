@@ -23,14 +23,11 @@ isNightTime <- function(datetime, ...)
 }
 
 
-
 # feature engineering:
 # - put derived variables on to modelling dataset
-# - convert to factors if necessary
+# - remove unneeded variables
 taxiFeaturesXdf <- taxiXdf %>%
     mutate(direct_distance=.dd(pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude),
            is_nighttime_pickup=.nt(pickup_datetime),
            .rxArgs=list(transformObjects=list(.dd=directDistance, .nt=isNightTime))) %>%
-    select(-(1:5), -ends_with("tude"), -ends_with("datetime"), -payment_type, -(17:20)) %>%
-    persist("data/nyctaxi_features.xdf")
-
+    select(-(1:5), -ends_with("tude"), -ends_with("datetime"), -payment_type, -(17:20))

@@ -80,8 +80,8 @@ dbGetQuery(db$con, "select * from nyctaxi_models where id='taxi_modGlm'")
 # the same, but with a complicated model fitted using open source R
 # ensemble of 20 single-layer neural networks with 5 hidden nodes each
 library(nnet)
-load("data/clm_modNN.rdata")
-print(clm_modNN)
+load("data/taxi_modNN.rdata")
+print(taxi_modNN)
 
 saveModelObjects(taxi_modNN, directDistance, isNightTime,
                  modelId="taxi_modNN", modelTable="nyctaxi_models", connectionString=connStr)

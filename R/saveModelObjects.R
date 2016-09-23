@@ -15,16 +15,3 @@ saveModelObjects <- function(..., modelId, modelTable, connectionString=NULL)
     rxClose(dest)
 }
 
-
-execSql <- function(string, connectionString)
-{
-    dest <- RxOdbcData(sqlQuery="select 1", connectionString=connectionString)
-    rxOpen(dest, mode="r")
-    rxExecuteSQLDDL(dest, sSQLString=string)
-    rxClose(dest)
-}
-
-execSql("create table tst (id varchar(30), rdata varbinary(max))", connStr)
-execSql("insert into tst values ('id1', convert(varbinary(max), '123456abcdef', 2))", connStr)
-
-
