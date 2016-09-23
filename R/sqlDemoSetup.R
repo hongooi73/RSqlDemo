@@ -1,57 +1,53 @@
-# globally visible sql.yaml location (for R Services)
-RServicesYamlLocation <- "c:/"
-
 ## R package dependencies:
 # RSQLServer
-# yaml
 # dplyr
 # dplyrXdf (for setup only; get the source from https://github.com/RevolutionAnalytics/dplyrXdf)
 ## other dependencies:
 # 64-bit Java
 
 
-# update SQL scoring scripts with login details
-updateSQLScript <- function(sqlFile, RServicesYamlLocation)
+# update SQL scripts with database name
+updateSQLScript <- function(sqlFile)
 {
     dbName <- names(yaml::yaml.load_file("sql.yaml")[1])
     lines <- readLines(sqlFile)
     lines[1] <- sprintf("use %s", dbName)
-    RServicesYamlLocation <- normalizePath(file.path(RServicesYamlLocation, "sql.yaml"),
-        winslash="/", mustWork=FALSE)
-    lines <- gsub("c:/sql.yaml", RServicesYamlLocation, lines, fixed=TRUE)
     writeLines(lines, sqlFile)
 }
 
-updateSQLScript("sql/scoreProc.sql", RServicesYamlLocation)
-updateSQLScript("sql/scoreProcNN.sql", RServicesYamlLocation)
-updateSQLScript("sql/scoreExec.sql", RServicesYamlLocation)
-updateSQLScript("sql/scoreExecNN.sql", RServicesYamlLocation)
+updateSQLScript("sql/scoreProc.sql")
+updateSQLScript("sql/scoreProcNN.sql")
+updateSQLScript("sql/scoreExec.sql")
+updateSQLScript("sql/scoreExecNN.sql")
 
 
-# source data from packages.revo
-# synthetic dataset (?) of insurance claims
+# sample of NYC taxi ride data, download from Azure blob storage
 if(!dir.exists("data")) dir.create(data)
-download.file("http://packages.revolutionanalytics.com/datasets/claims.xdf", "data/claims.xdf", mode="wb")
+if(!file.exists("data/nyctaxi_sample.csv"))
+    download.file("http://getgoing.blob.core.windows.net/public/nyctaxi1pct.csv", "data/nyctaxi_sample.csv")
 
 
-# add a has_claim indicator
+# import to xdf, convert datetimes from char to POSIXct
 library(dplyrXdf)
-clm <- RxXdfData("data/claims.xdf")
-rxDataStep(clm, clm, transforms=list(has_claim=Claim_Amount > 0), overwrite=TRUE)
+taxiCsv <- RxTextData("data/nyctaxi_sample.csv")
+taxiXdf <- taxiCsv %>%
+    mutate(pickup_datetime=as.POSIXct(pickup_datetime),
+           dropoff_datetime=as.POSIXct(dropoff_datetime)) %>%
+    persist("data/nyctaxi_sample.xdf")
 
 
 # upload full dataset to database
 connStr <- local({
-	db <- yaml::yaml.load_file("sql.yaml")
-	sprintf("Driver=SQL Server;Server=%s;database=%s;Uid=%s;Pwd=%s",
-			db[[1]]$server, names(db)[1], db[[1]]$user, db[[1]]$password)
+    db <- yaml::yaml.load_file("sql.yaml")
+    sprintf("Driver=SQL Server;Server=%s;database=%s;Uid=%s;Pwd=%s",
+            db[[1]]$server, names(db)[1], db[[1]]$user, db[[1]]$password)
 })
-clmSql <- RxSqlServerData("claims", connectionString=connStr)
-if(!rxSqlServerTableExists("claims", connStr)) rxDataStep(clm, clmSql)
+taxiSql <- RxSqlServerData("nyctaxi_sample", connectionString=connStr)
+if(!rxSqlServerTableExists("nyctaxi_sample", connStr)) rxDataStep(taxiXdf, taxiSql)
 
 # upload first 100 rows as sample
-clmSqlSamp <- RxSqlServerData("claimsSamp", connectionString=connStr)
-if(!rxSqlServerTableExists("claimsSamp", connStr)) rxDataStep(clm, clmSqlSamp, numRows=100)
+taxiSamp <- RxSqlServerData("nyctaxi_sample100", connectionString=connStr)
+if(!rxSqlServerTableExists("nyctaxi_sample100", connStr)) rxDataStep(taxiXdf, taxiSamp, numRows=100)
 
 
 # create some derived variables for modelling

@@ -1,51 +1,49 @@
 use sqlDemoLocal
 go
 
-drop procedure if exists dbo.clm_scoreNN
+drop procedure if exists dbo.nyctaxi_scoreNN
 go
 
-create procedure dbo.clm_scoreNN as
-begin
+create procedure dbo.nyctaxi_scoreNN
+    @modelId nvarchar(50) = '',
+    @scoreData nvarchar(50) = ''
+as begin
     declare @inquery nvarchar(max)=N'
-        select * from clm_modNN
-    '
-    insert into claimsSamp_predNN
+        select * from ' + quotename(@scoreData);
+
+    declare @rdatabinary varbinary(max)=(
+        select top 1
+            rdata
+        from nyctaxi_models
+        where id=@modelId
+    )
+
+    insert into nyctaxi_predNN
     exec sp_execute_external_script @language=N'R', @script=N'
-        predict_modNN <- function(obj, data, woe)
+        predict_modNN <- function(obj, data)
         {
-            Cat <- grep("^Cat", names(data), value=TRUE)
-            woedf <- mapply(function(x, val) val[match(x, names(val))],
-                data[Cat], woe, SIMPLIFY=FALSE)
-            names(woedf) <- paste("woe", Cat, sep="_")
-            woedf <- cbind(data, woedf)
-            preds <- sapply(obj, predict, woedf)
-            as.data.frame(rowMeans(preds))
+            require(nnet)
+            preds <- sapply(obj, predict, data)
+            data.frame(tipped_pred=rowMeans(preds))
         }
 
-        library(nnet)
-
-        # unserialise the model
-        rdata <- strsplit(as.character(InputDataSet$rdata), "")[[1]]
-        rdata <- paste0(rdata[c(TRUE, FALSE)], rdata[c(FALSE, TRUE)])
-        rawCont <- memDecompress(as.raw(strtoi(rdata, 16)), "gzip")
+        # unserialise model objects
+        rawCont <- memDecompress(as.raw(model), "gzip")
         rc <- rawConnection(rawCont, "rb")
         load(rc)
         close(rc)
 
-        connStr <- local({
-            db <- yaml::yaml.load_file("c:/sql.yaml")
-            sprintf("Driver=SQL Server;Server=%s;database=%s;Uid=%s;Pwd=%s",
-                    db[[1]]$server, names(db)[1], db[[1]]$user, db[[1]]$password)
+        InputDataSet <- within(InputDataSet, {
+            direct_distance <- directDistance(pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude)
+            is_nighttime_pickup <- isNightTime(pickup_datetime, origin="1970-01-01")
         })
 
-        clm <- rxDataStep(RxSqlServerData("claimsSamp", connectionString=connStr))
-
-        Cat <- grep("^Cat", names(clm), value=TRUE)
-        woedf <- mapply(function(x, val) val[match(x, names(val))],
-            clm[Cat], woe, SIMPLIFY=FALSE)
-        names(woedf) <- paste("woe", Cat, sep="_")
-        woedf <- cbind(clm, woedf)
-        OutputDataSet <- predict_modNN(clm_modNN, woedf, woe)
+        OutputDataSet <- predict_modNN(taxi_modNN, InputDataSet)
     ',
-    @input_data_1=@inquery
+    @input_data_1=@inquery,
+    @params=N'@model varbinary(max)',
+    @model=@rdatabinary
 end
+
+
+

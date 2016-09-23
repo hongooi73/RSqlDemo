@@ -1,4 +1,4 @@
-saveModelObjects <- function(..., destTable, connectionString=NULL)
+saveModelObjects <- function(..., modelId, modelTable, connectionString=NULL)
 {
     objnames <- as.character(substitute(list(...)))[-1]
 
@@ -9,8 +9,9 @@ saveModelObjects <- function(..., destTable, connectionString=NULL)
 
     dest <- RxOdbcData(sqlQuery="select 1", connectionString=connectionString)
     rxOpen(dest, mode="r")
-    rxExecuteSQLDDL(dest, sSQLString=sprintf("drop table if exists %s", destTable))
-    rxExecuteSQLDDL(dest, sSQLString=sprintf("create table %s (rdata varchar(max))", destTable))
-    rxExecuteSQLDDL(dest, sSQLString=sprintf("insert into %s values ('%s')", destTable, rdata))
+    rxExecuteSQLDDL(dest, sSQLString=sprintf(
+        "insert into %s values ('%s', convert(varbinary(max), '%s', 2))",
+        modelTable, modelId, rdata))
     rxClose(dest)
 }
+
