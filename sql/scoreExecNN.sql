@@ -1,11 +1,11 @@
 use sqlDemoLocal
 go
 
-drop table if exists claimsSamp_predNN;
-create table claimsSamp_predNN (
-    has_claim_Pred double precision
+drop table if exists nyctaxi_predNN;
+create table nyctaxi_predNN (
+    tipped_Pred double precision
 );
 
-exec clm_scoreNN;
-select * from claimsSamp_predNN;
+exec nyctaxi_scoreNN @modelId=N'taxi_modNN', @scoreData=N'nyctaxi_sample100';;
+select * from nyctaxi_predNN;
 

@@ -30,7 +30,7 @@ updateSQLScript("sql/scoreExecNN.sql", RServicesYamlLocation)
 
 # sample of NYC taxi ride data, download from Azure blob storage
 if(!dir.exists("data")) dir.create(data)
-if(!file.exists("data/nyctaxis_sample.csv"))
+if(!file.exists("data/nyctaxi_sample.csv"))
     download.file("http://getgoing.blob.core.windows.net/public/nyctaxi1pct.csv", "data/nyctaxi_sample.csv")
 
 

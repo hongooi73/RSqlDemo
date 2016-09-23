@@ -1,4 +1,4 @@
-saveModelObjects <- function(..., id, connectionString=NULL)
+saveModelObjects <- function(..., modelId, modelTable, connectionString=NULL)
 {
     objnames <- as.character(substitute(list(...)))[-1]
 
@@ -9,11 +9,22 @@ saveModelObjects <- function(..., id, connectionString=NULL)
 
     dest <- RxOdbcData(sqlQuery="select 1", connectionString=connectionString)
     rxOpen(dest, mode="r")
-    rxExecuteSQLDDL(dest, sSQLString=sprintf("exec RSqlSaveModel @id='%s' @model='%s'", id, rdata))
+    rxExecuteSQLDDL(dest, sSQLString=sprintf(
+        "insert into %s values ('%s', convert(varbinary(max), '%s', 2))",
+        modelTable, modelId, rdata))
     rxClose(dest)
 }
 
-#m <- lm(mpg ~ ., mtcars)
-#rc <- memCompress(serialize(m, connection=NULL))
-#ch <- paste(rc, collapse="")
+
+execSql <- function(string, connectionString)
+{
+    dest <- RxOdbcData(sqlQuery="select 1", connectionString=connectionString)
+    rxOpen(dest, mode="r")
+    rxExecuteSQLDDL(dest, sSQLString=string)
+    rxClose(dest)
+}
+
+execSql("create table tst (id varchar(30), rdata varbinary(max))", connStr)
+execSql("insert into tst values ('id1', convert(varbinary(max), '123456abcdef', 2))", connStr)
+
 

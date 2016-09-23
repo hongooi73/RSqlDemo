@@ -16,9 +16,9 @@ directDistance <- function(x_long, x_lat, y_long, y_lat)
 
 
 # arbitrary 6-hour classification of 9pm-3am as "night"
-isNightTime <- function(datetime)
+isNightTime <- function(datetime, ...)
 {
-    hour <- as.POSIXlt(datetime)$hour
+    hour <- as.POSIXlt(datetime, ...)$hour
     hour >= 9  | hour < 3
 }
 
