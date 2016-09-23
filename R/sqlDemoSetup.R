@@ -1,31 +1,24 @@
-# globally visible sql.yaml location (for R Services)
-RServicesYamlLocation <- "c:/"
-
 ## R package dependencies:
 # RSQLServer
-# yaml
 # dplyr
 # dplyrXdf (for setup only; get the source from https://github.com/RevolutionAnalytics/dplyrXdf)
 ## other dependencies:
 # 64-bit Java
 
 
-# update SQL scoring scripts with login details
-updateSQLScript <- function(sqlFile, RServicesYamlLocation)
+# update SQL scripts with database name
+updateSQLScript <- function(sqlFile)
 {
     dbName <- names(yaml::yaml.load_file("sql.yaml")[1])
     lines <- readLines(sqlFile)
     lines[1] <- sprintf("use %s", dbName)
-    RServicesYamlLocation <- normalizePath(file.path(RServicesYamlLocation, "sql.yaml"),
-        winslash="/", mustWork=FALSE)
-    lines <- gsub("c:/sql.yaml", RServicesYamlLocation, lines, fixed=TRUE)
     writeLines(lines, sqlFile)
 }
 
-updateSQLScript("sql/scoreProc.sql", RServicesYamlLocation)
-updateSQLScript("sql/scoreProcNN.sql", RServicesYamlLocation)
-updateSQLScript("sql/scoreExec.sql", RServicesYamlLocation)
-updateSQLScript("sql/scoreExecNN.sql", RServicesYamlLocation)
+updateSQLScript("sql/scoreProc.sql")
+updateSQLScript("sql/scoreProcNN.sql")
+updateSQLScript("sql/scoreExec.sql")
+updateSQLScript("sql/scoreExecNN.sql")
 
 
 # sample of NYC taxi ride data, download from Azure blob storage
