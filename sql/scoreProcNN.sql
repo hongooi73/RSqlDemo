@@ -5,17 +5,16 @@ drop procedure if exists dbo.nyctaxi_scoreNN
 go
 
 create procedure dbo.nyctaxi_scoreNN
-    @modelId nvarchar(50) = '',
-    @scoreData nvarchar(50) = ''
 as begin
     declare @inquery nvarchar(max)=N'
-        select * from ' + quotename(@scoreData);
+        select *
+        from nyctaxi_sample100'
 
     declare @rdatabinary varbinary(max)=(
         select top 1
             rdata
         from nyctaxi_models
-        where id=@modelId
+        where id = 'taxi_modNN'
     )
 
     insert into nyctaxi_predNN

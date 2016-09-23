@@ -1,6 +1,6 @@
 ## Summary
 
-This is a short (15-20 minute) presentation focused specifically on how Microsoft R Server and SQL Server can be used together. It was given originally at the Melbourne SQL Server launch event in September 2016\. It's meant for an audience of mainly SQL professionals, so it doesn't mention of Streaming Analytics, HDInsight, AzureML, or any other bits not relevant to the subject at hand. There are minimal dependencies (except for Java); it should be possible to run this on both Windows and Linux. It doesn’t need access to commandline tools like bash, PowerShell or sqlcmd.
+This is a short (15-20 minute) presentation focused specifically on how Microsoft R Server and SQL Server can be used together. It's based on a demo given originally at the Melbourne SQL Server launch event in September 2016\. It's meant for an audience of mainly R and SQL professionals, so it doesn't mention of Streaming Analytics, HDInsight, AzureML, or any other bits not relevant to the subject at hand. There are minimal dependencies (except for Java); it should be possible to run this on both Windows and Linux. It doesn’t need access to commandline tools like bash, PowerShell or sqlcmd.
 
 
 ## Demo outline
